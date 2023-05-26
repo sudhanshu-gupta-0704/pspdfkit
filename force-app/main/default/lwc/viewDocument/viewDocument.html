@@ -1,0 +1,34 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 03-20-2023
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <lightning-card>
+        <lightning-input label="contactId" onchange={readContactId}></lightning-input>
+        <lightning-button disabled={disableSubmitButton} label="Read Templates" onclick={readTemplates}></lightning-button>
+        <template if:true={showAvailableTemplates}>
+          <br>
+          <br>
+          <br>
+          <lightning-radio-group name="radioGroup"
+                          label="Available Templates"
+                          options={templateList}
+                          onchange={handleTemplateSelection}
+                          type="radio"></lightning-radio-group>
+        </template>
+
+        
+          <template if:true={showDocument}>
+            <div class="viewer" style="display: flex; background-color: white;">
+              <iframe
+                  src="/apex/PSPDFKit_ViewDocument?context=Mapping&sFileId=0681e000000ugTJAAY"
+                  style="border: none; height: 100vh"
+                  width="70%"
+            ></iframe>
+            </div>
+        </template>
+    </lightning-card>
+</template>

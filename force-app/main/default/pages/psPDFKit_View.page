@@ -1,0 +1,19 @@
+<apex:page >
+<apex:includeLightning />
+ <div id="LightningComponentid" /> 
+  <script>
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  
+  $Lightning.use("c:psPDFKit_AuraApp", function() {
+            $Lightning.createComponent("c:psPDFKit_ViewDocument",
+            { 
+              urlParam: urlParams.get('document')
+            },
+            "LightningComponentid",
+            function(cmp) {
+              console.log('LWC Componenet added in VF page');
+            });
+          });
+  </script>
+</apex:page>

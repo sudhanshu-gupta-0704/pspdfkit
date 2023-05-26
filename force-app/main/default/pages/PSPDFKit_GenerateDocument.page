@@ -1,0 +1,265 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 04-10-2023
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<apex:page controller="documentGeneratorCtrl">
+  <apex:pageMessages id="showmsg"></apex:pageMessages>
+  <!-- PSPDF Init div -->
+  <div id="pspdfkit" style="width: 100%; height: 100vh"></div>
+
+  <apex:includeLightning />    
+  <div id="LightningComponentid" />   
+
+  <script src="{!$Resource.PSPDFKit}" type="text/javascript"></script>
+  <script type="text/javascript">
+      
+      
+       
+        var getDetails = "{!TemplateData}";
+        checkForErrors(getDetails);
+        var base64str;
+        var logId;
+        var instantJSONData;
+        var instanceObj;
+        var tempInstance = null;
+        var contVersion;
+        var state;
+        var pdf;
+        var baseUrl = `${window.location.protocol}//${window.location.host}{!$Resource.PSPDFKit_lib}/`;
+        var baseCoreUrl = `${window.location.protocol}//${window.location.host}{!$Resource.PSPDFKit_core}/`;
+        var updatedFile;
+        var fieldMapping;
+        var templateId;
+        var record;
+        var fieldMap;
+        var readOnlyFields;
+        var requiredFields;
+        var licensekey;
+    
+        //All Tools
+        const toolbar = [{"type":"sidebar-thumbnails"},{"type":"sidebar-document-outline"},{"type":"sidebar-annotations"},{"type":"sidebar-bookmarks"},{"type":"pager"},{"type":"multi-annotations-selection"},{"type":"pan"},{"type":"zoom-out"},{"type":"zoom-in"},{"type":"zoom-mode"},{"type":"spacer"},{"type":"annotate"},{"type":"ink"},{"type":"highlighter"},{"type":"text-highlighter"},{"type":"ink-eraser"},{"type":"signature"},{"type":"image"},{"type":"stamp"},{"type":"note"},{"type":"text"},{"type":"line"},{"type":"link"},{"type":"arrow"},{"type":"rectangle"},{"type":"ellipse"},{"type":"polygon"},{"type":"cloudy-polygon"},{"type":"polyline"},{"type":"print"},{"type":"document-editor"},{"type":"document-crop"},{"type":"search"},{"type":"export-pdf"}];
+        const allowedTools = [{"type":"pager"},{"type":"zoom-out"},{"type":"zoom-in"},{"type":"export-pdf"} ];
+    
+            window.addEventListener("message", function (event) {
+                console.log('Event Cached');
+                generateForm();
+     /* tempInstance.contentDocument
+        .querySelector(".PSPDFKit-Annotation-Widget[name='"+event.data+"']").focus(); */
+            });
+    
+        window.addEventListener("", function (event) {
+                console.log('Event Cached');
+                generateForm();
+     /* tempInstance.contentDocument
+        .querySelector(".PSPDFKit-Annotation-Widget[name='"+event.data+"']").focus(); */
+            });
+    
+        
+          if (getDetails != null) {
+              //Variable Declaration
+              base64str = "{!base64String}";
+              instantJSONData= "{!instantValues}";
+              templateId = "{!templateId}";
+              record = "{!record}";
+              readOnlyFields = "{!readOnlyFields}"
+              requiredFields = "{!requiredFields}"
+              logId= "{!logId}"
+              licensekey = "{!licensekey}"
+              console.log('Read Only:'+ readOnlyFields);
+              
+              var formFieldMap = new Array();
+
+              //Create Instant JSON
+              instantJSONData.replace(/(\b[^:]+):'([^']+)'/g, function ($0, param, value) {
+                  var formField = new Object();
+                  formField.v = 1;
+                  formField.name = param.substring(0, param.length - 1);
+                  formField.value = value;
+                  formField.type = 'pspdfkit/form-field-value';
+                    formFieldMap.push(formField);
+                    });
+              if(instantJSONData){
+                  instanceObj = {
+                      format : 'https://pspdfkit.com/instant-json/v1',
+                      formFieldValues : formFieldMap
+                      }
+                  console.log('instanceObj: ' + JSON.stringify(instanceObj));
+                  }
+              
+              if (base64str != null && base64str != "") {
+                  //Load PDF
+                  loadPSPDFKitBase64();
+              }
+            }
+   
+            
+            
+            function loadPSPDFKitBase64() {
+      var base64 = base64str;
+      var binary = atob(base64.replace(/\s/g, ""));
+      var len = binary.length;
+      var buffer = new ArrayBuffer(len);
+      var view = new Uint8Array(buffer);
+      for (var i = 0; i < len; i++) {
+        view[i] = binary.charCodeAt(i);
+      }
+      base64str = new Blob([view]);
+
+      base64str.arrayBuffer().then((val) => {
+        PSPDFKit.load({
+          baseUrl,
+          baseCoreUrl,
+          container: "#pspdfkit",
+          document: val,
+          licenseKey: licensekey,
+          instantJSON : instanceObj,
+          toolbarItems: allowedTools.concat([saveButton]),
+          isEditableAnnotation: function(annotation) {
+                // Check if the annotation is associated with a specific form field
+                    console.log('Field: '+annotation.formFieldName);
+                    if(readOnlyFields.length > 0 ){
+                        if (annotation instanceof PSPDFKit.Annotations.WidgetAnnotation && readOnlyFields.includes(annotation.formFieldName)) {
+                       // If it is, disallow editing it
+                       return false;
+                    } 
+                        return true;
+                    }
+                   
+                // Otherwise, allow editing
+            
+          },
+          disableWebAssemblyStreaming: true,
+          isSalesforce: true
+        }).then((instance) => {
+            fieldList = [];
+            //Read Instance
+            tempInstance = instance;
+            
+            tempInstance.getFormFields().then((fields)=> {
+                fields.forEach((element)=>{
+                console.log('Fields : '+element); 
+                })
+            })
+            
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      });
+    }
+    const saveButton = {
+      type: "custom",
+      id: "download-pdf",
+      title: "Save",
+      onPress: () => {
+        saveFileToSalesforce();
+        console.log('Save Clicked');
+      }
+    };
+    function saveFileToSalesforce() {
+      let fields = {};
+      tempInstance.getFormFields().then((formFields) => {
+                fields = {};
+                formFields.forEach((formField) => {
+                  if(formField.value != ''&& formField.value != null){
+                    fields[formField.name] = formField.value;
+                  } else {
+                        if(requiredFields.includes(formField.name)){
+                            alert(formField.name +' is a required field.');
+                            return null;
+                        }   
+                    }
+                });
+                fieldMap = fields;
+      });
+      tempInstance.exportPDF().then((buffer) => {
+        const blob = new Blob([buffer], { type: "application/pdf" });
+        getBase64(blob).then((result) => {
+          this.updatedFile = result;
+          console.log('File: '+result);
+          processData(result);
+          console.log('Form Fields: '+JSON.stringify(fields));
+        });
+      });
+    }
+    
+    function generateForm(){
+        tempInstance.exportPDF().then((buffer) => {
+        const blob = new Blob([buffer], { type: "application/pdf" });
+        getBase64(blob).then((result) => {
+          this.updatedFile = result;
+          createDocument(result);
+        });
+      });
+     }
+    
+    function processData(file){
+            $Lightning.use("c:psPDFKit_AuraApp", function() {
+            $Lightning.createComponent("c:psPDFKit_EventListener",
+            { 
+              context : 'processData',
+              base64String : file, 
+              templateId : templateId,
+              recordId :  record,
+              fields : fieldMap,
+              logId : logId
+            },
+            "LightningComponentid",
+            function(cmp) {
+              console.log('LWC Componenet added in VF page');
+            });
+          });
+    }
+    
+    function createDocument(file){
+            $Lightning.use("c:psPDFKit_AuraApp", function() {
+            $Lightning.createComponent("c:psPDFKit_EventListener",
+            { 
+              context : 'createDocument',
+              base64String : file, 
+              templateId : templateId,
+              recordId :  record
+            },
+            "LightningComponentid",
+            function(cmp) {
+              console.log('LWC Componenet added in VF page');
+            });
+          });
+    }
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          let result = reader.result;
+          let base64 = "base64,";
+          let content = result.indexOf(base64) + base64.length;
+          let fileContents = result.substring(content);
+          resolve(fileContents);
+        };
+        reader.onerror = (error) => reject(error);
+      });
+    }
+    function checkForErrors(data){
+        if(data.startsWith('Error:')){
+            $Lightning.use("c:psPDFKit_AuraApp", function() {
+            $Lightning.createComponent("c:psPDFKit_EventListener",
+            { 
+              context : 'showMessage',
+              title : 'Error Occured',
+              message : data, 
+              type : 'error'
+            },
+            "LightningComponentid",
+            function(cmp) {
+              console.log('LWC Componenet added in VF page');
+            });
+          });
+        }
+        }
+       //window.close();
+  </script>
+ </apex:page>

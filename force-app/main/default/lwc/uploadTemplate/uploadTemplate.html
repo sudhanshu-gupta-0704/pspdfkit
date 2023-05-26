@@ -1,0 +1,14 @@
+<template>
+
+    <lightning-quick-action-panel header="Upload Template">
+
+        <lightning-file-upload
+        name="fileUploader"
+        accept=".pdf"
+        record-id={recordId}
+        onuploadfinished={handleUploadFinished}
+    >
+    </lightning-file-upload>
+    </lightning-quick-action-panel>
+    
+</template>

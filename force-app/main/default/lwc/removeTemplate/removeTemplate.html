@@ -1,0 +1,12 @@
+<template>
+    <div class="slds-hide">{recordId}</div>
+    <template if:true={retrievedRecordId}>
+    <lightning-quick-action-panel header="Remove Template">
+		Are you sure you want to remove file template from this record ?
+		<div slot="footer">
+			<lightning-button variant="neutral" label="Cancel" onclick={handleCancel}></lightning-button>
+			<lightning-button variant="brand" label="Confirm" class="slds-m-left_x-small" onclick={handleRemoveTemplate}></lightning-button>
+		</div>
+	</lightning-quick-action-panel>
+</template>
+</template>

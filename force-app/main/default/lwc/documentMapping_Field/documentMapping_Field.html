@@ -1,0 +1,29 @@
+<template>
+    <lightning-card  title={labelValue} class={style}>
+        <div class="slds-grid slds-gutters">
+        <div class="slds-col">
+            <h1>Salesforce Field:</h1>
+            <lightning-combobox
+                    data-field="field"
+                    variant="label-hidden"
+                    options={optionValues}
+                    onchange={valueChanged}
+                  ></lightning-combobox>
+        </div>
+        <div class="slds-col">
+            <h1>Document Generation:</h1>
+            <lightning-input type="checkbox" data-field="field" data-fieldtype="checkbox" label="Required" data-section="Generation" field-level-help="If not selected field will appear  as readonly on generated document."></lightning-input>
+        </div>
+        <div class="slds-col">
+            <h1>Document Submission:</h1>
+                <lightning-radio-group
+                    data-field="field"
+                    options={documentSubmissionOptions}
+                    data-fieldtype="combobox"
+                    value="Read-only"
+                    type="radio"></lightning-radio-group>
+        </div>
+    </div>
+    </lightning-card>
+    
+</template>

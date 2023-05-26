@@ -1,0 +1,52 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 03-21-2023
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+  <!-- Template Uploaded -->
+  <template if:true={templateUploaded}>
+  <template if:false={showMapping}>
+    <button class="slds-button slds-button_neutral slds-button_stretch" onclick={handleMappingVisibility}>Map Fields</button>
+    <div class="viewer">
+        <iframe
+            src={url}
+            style="border: none; height: 100vh"
+            width="100%"
+        ></iframe>
+      </div>
+    </template>
+      <template if:true={showMapping}>
+        <div class="viewer" style="display: flex; background-color: white;">
+          <iframe
+              src={url}
+              style="border: none; height: 100vh"
+              width="70%"
+          ></iframe>
+          <lightning-card style="width: 30%; height: 100vh" class="slds-scrollable_y">
+            <table>
+              <template for:each={formFields} for:item="formField">
+              <tr key={formField}>
+                <td class={formField.label}>
+                  <c-document-mapping_-field label-value={formField.label} selected-field={formField.label} option-values={dropdownOptions}>
+                  </c-document-mapping_-field>                  
+                </td>
+              </tr>
+             </template>
+            </table>
+            <lightning-button label="Save Mapping" onclick={saveMapping}></lightning-button>
+          </lightning-card>
+          
+        </div>
+        
+      </template>
+  </template>
+  <!-- Template Not Uploaded -->
+  <template if:false={templateUploaded}>
+    <lightning-card>
+            <p class="slds-p-horizontal_small">Please upload a template to continue.</p>
+    </lightning-card>
+  </template>
+</template>

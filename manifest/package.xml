@@ -2,11 +2,11 @@
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
 	<types>
 		<members>DocumentMappingScreenCtrl</members>
+		<members>DocumentViewer</members>
 		<members>PSPDFKitController</members>
 		<members>PSPDFKitControllerTest</members>
 		<members>docGenLogTriggerHandler</members>
 		<members>documentGeneratorCtrl</members>
-		<members>DocumentViewer</members>
 		<name>ApexClass</name>
 	</types>
 	<types>
@@ -55,6 +55,14 @@
 		<name>FlexiPage</name>
 	</types>
 	<types>
+		<members>Data_Mapping__c-Data Mapping Layout</members>
+		<members>Document_Generation_Log__c-Document Generation Log Layout</members>
+		<members>Document_Model__c-Document Model Layout</members>
+		<members>Document_Signer__c-Document Signer Layout</members>
+		<members>Document_Template__c-Document Template Layout</members>
+		<name>Layout</name>
+	</types>
+	<types>
 		<members>docGeneratorLWC</members>
 		<members>documentMapping_Field</members>
 		<members>documentTemplateMapping</members>
@@ -67,16 +75,17 @@
 		<name>LightningComponentBundle</name>
 	</types>
 	<types>
+		<members>PSPDFKit_User_Access</members>
 		<members>PSPDFKit_Admin_Access</members>
 		<name>PermissionSet</name>
 	</types>
 	<types>
-		<members>Document_Template__c.Upload_Template</members>
-		<members>Document_Template__c.Remove_Template</members>
+		<members>Contact.Generate_Document</members>
 		<members>Document_Template__c.Activate_Template</members>
 		<members>Document_Template__c.Deactivate_Template</members>
 		<members>Document_Template__c.Modify_Template</members>
-		<members>Contact.GenerateDocument</members>
+		<members>Document_Template__c.Remove_Template</members>
+		<members>Document_Template__c.Upload_Template</members>
 		<name>QuickAction</name>
 	</types>
 	<types>
